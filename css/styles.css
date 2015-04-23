@@ -1,0 +1,105 @@
+.column {
+	width: 5vw;
+	min-width: 20px;
+	max-width: 44px;
+	height: 5vw;
+	min-height: 20px;
+	max-height: 44px;
+	display: inline-block;
+	position: relative;
+}
+.box-TL, .box-TR, .box-BL, .box-BR, 
+.box-TM, .box-BM, .box-ML, .box-MR {
+	width: 50%;
+	height: 50%;
+    position: absolute;
+	margin: auto;
+}
+.box-TL {
+    top: 0px;
+	left: 0px;	
+}
+.box-TR {
+    top: 0px;
+    right: 0px;
+}
+.box-BL {
+    bottom: 0px;
+	left: 0px;
+}
+.box-BR {
+    bottom: 0px;
+    right: 0px;
+}
+.box-TM {
+	width: 1px;
+	top: 0px;
+	left:0px;
+	right:0px;
+	border: 1px solid black;
+}
+.box-BM {
+	width: 1px;
+	bottom: 0px;
+	left:0px;
+	right:0px;
+	border: 1px solid black;
+}
+.box-ML {
+	height: 1px;
+	top:0px;
+	bottom: 0px;
+	left:0px;
+	border: 1px solid black;
+}
+.box-MR {
+	height: 1px;
+	top:0px;
+	bottom: 0px;
+	right:0px;
+	border: 1px solid black;
+}
+.color1 { 
+    background-color: blue;
+}
+.color2 { 
+    background-color: red;
+}
+.border1 { 
+    border: 2px solid blue;
+}
+.border2 { 
+    border: 2px solid red;
+}
+.token1, .token2, .diagonal-TR, .diagonal-BL, .diagonal-TL, .diagonal-BR, .selected {
+	top:0px;
+	left:0px;
+	bottom: 0px;
+	right:0px;
+    position: absolute;
+	margin: auto;
+}
+.token1, .token2 { 
+    height: 50%; 
+    width: 50%;
+    border-radius: 100%;
+}
+.diagonal-TR, .diagonal-BL { 
+    -webkit-transform: rotate(45deg); 
+    transform: rotate(45deg); 
+    height: 22px;
+	max-height: 40px;
+    width: 3px;
+}
+.diagonal-TL, .diagonal-BR { 
+    -webkit-transform: rotate(135deg); 
+    transform: rotate(135deg); 
+    height: 22px; 
+	max-height: 40px;
+    width: 3px;	
+}
+.selected { 
+    height: 70%; 
+    width: 70%;
+    border-radius: 100%;
+}
