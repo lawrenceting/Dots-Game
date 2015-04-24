@@ -15,10 +15,7 @@ function findNeighbours(p){
 			}
 		}
 	}
-	return {
-		neighbours:NBS, 
-		directions:DRS
-	};
+	return { neighbours:NBS, directions:DRS };
 }
 
 function containsArr(list, find){
@@ -80,24 +77,24 @@ function printGrid(list, fill){
 }
 
 function resetVars(){
-	cur_turn = (cur_turn===1) ? 2 : 1;
+	cur_turn = (cur_turn===1)?2:1;
 	connection = [];
 	captured = [];
 	route = [];
 }
 
 function resizeCSS(){
-	var height = Math.ceil($(".column").outerHeight()/2);
-	var hypotenuse = Math.ceil(Math.sqrt(height*height + height*height));
+	var col_height = Math.ceil($(".column").outerHeight()/2);
+	var hypotenuse = Math.ceil(Math.sqrt(col_height*col_height + col_height*col_height));
 	$(".diagonal-TL, .diagonal-TR, .diagonal-BL, .diagonal-BR").outerHeight(hypotenuse);
 }
 
 function drawGrid(){
-	var rowHTML = '';
+	var str = '';
 		for(var r = 0; r < NUMBER_ROWS; r++){
-			rowHTML+='<div class="' + ((r===0 || r===NUMBER_ROWS-1) ? 'side' : '') + '">';
+			str+='<div class="' + ((r===0 || r===NUMBER_ROWS-1) ? 'side' : '') + '">';
 			for(var c=0; c<NUMBER_COLS; c++){
-				rowHTML+=
+				str+=
 					'<div class="column" id="'+r+'x'+c+'"> ' + 
 						'<div class="box-TL ' + ((c===0 || c===NUMBER_ROWS-1) ? 'side' : '') + '"><div class="diagonal"></div></div>' + 
 						'<div class="box-TR ' + ((c===0 || c===NUMBER_ROWS-1) ? 'side' : '') + '"><div class="diagonal"></div></div>' + 
@@ -107,14 +104,14 @@ function drawGrid(){
 						'<div class="box-BM ' + ((c===0 || c===NUMBER_ROWS-1) ? 'side' : '') + '"></div>' + 
 						'<div class="box-ML ' + ((c===0 || c===NUMBER_ROWS-1) ? 'side' : '') + '"></div>' + 
 						'<div class="box-MR ' + ((c===0 || c===NUMBER_ROWS-1) ? 'side' : '') + '"></div>' + 
-						'<div class="token"></div>' + 
-						'<div class="selected"></div>' + 
+						
+						'<div class="selected">' + '<div class="token"></div>'  +'</div>' + 
 						'<div class="player">' + (SHOWGRIDVALUE ? grid[r][c] : '') + '</div>' + 
 					'</div>'
 			}
-			rowHTML+="</div>";
+			str+='</div>';
 		}
-	$("#grid").html(rowHTML);
+	$("#grid").html(str);
 
 	for(var r = 0; r < NUMBER_ROWS; r++){
 		for(var c=0; c<NUMBER_COLS; c++){
@@ -141,7 +138,7 @@ function onClick(){
 		
 		if(!grid[r][c]){
 			$(this).find('.token').addClass('token'+cur_turn).addClass('color'+cur_turn);
-			$(this).find('.selected').addClass('border'+cur_turn);
+			$(this).find('.selected').addClass('ring'+cur_turn);
 			prev_selected.removeClass();
 			prev_selected = $(this).find('.selected');
 			printGrid(cur_plot, cur_turn);
@@ -175,21 +172,23 @@ function findConnections(CNT, CNTs, DR, DRTs, deadEnds){
 	//NBS = neighbours
 	//DR = direction
 	//DRs = stored directions
-	var firstRun = arraysEqual([CNT, cur_plot]);
-	var NBS_info = findNeighbours(CNT);
-	var NBS = NBS_info.neighbours; //find neighbouring plots with similar value
-	var NBS_DRT = NBS_info.directions; //find neighbouring plots direction
-	var NBS_join = NBS.map(function(plot){return plot.join(",")}); //convert to comma separated string
-	var NBS_removedCNTs = removeArr(NBS, CNTs.concat(deadEnds)); //remove repeated connections
-	
-	if(!firstRun) DRTs = DRTs.concat(DR); //add next direction
-	CNTs.push(CNT); //add next connection
+	//p = plot
+	var getNBS = findNeighbours(CNT);
+	var NBS = getNBS.neighbours; //find neighbouring plots with similar value
 	
 	if(NBS.length>=2){
+		var firstRun = arraysEqual([CNT, cur_plot]);
+		var NBS_DRT = getNBS.directions; //find neighbouring plots direction
+		var NBS_join = NBS.map(function(p){return p.join(",")}); //convert to comma separated string
+		var NBS_removedCNTs = removeArr(NBS, CNTs.concat(deadEnds)); //remove repeated connections		
+		
+		if(!firstRun) DRTs = DRTs.concat(DR); //add next direction
+		CNTs.push(CNT); //add next connection		
+		
 		if(CNTs.length>=4 && containsArr(NBS, cur_plot)){ //check if last plot connects to first plot
-			var rows = CNTs.map(function(plot){return plot[0]}); //get rows in CNTs
+			var rows = CNTs.map(function(p){return p[0]}); //get rows in CNTs
 				rows = _.uniq(rows);
-			var cols = CNTs.map(function(plot){return plot[1]}); //get cols in CNTs
+			var cols = CNTs.map(function(p){return p[1]}); //get cols in CNTs
 				cols = _.uniq(cols);
 			var plotsWithinCols = [];
 			var plotsWithinRows = [];
@@ -203,14 +202,14 @@ function findConnections(CNT, CNTs, DR, DRTs, deadEnds){
 					if(thisRow===thatRow) plotsOnRow.push(plot); //if plots belong to same row
 				});	
 				if(plotsOnRow.length>1){
-					var colsOnRow = plotsOnRow.map(function(plot){return plot[1]}).sort(function(a,b){return a-b}); //get all columns on the samw row, and sort them
+					var colsOnRow = plotsOnRow.map(function(plot){return plot[1]}).sort(function(a,b){return a-b}); //get all columns on the same row, and sort them
 
 					for(var j=0; j<colsOnRow.length-1; j++){
 						var thisCol = colsOnRow[j]+1, //first column
 							thatCol = colsOnRow[j+1]; // next column
 						for(var i=thisCol; i<thatCol; i++) plotsWithinCols.push([thisRow, i]);
 					}
-				}							
+				}					
 			}
 			//check if captured is within rows
 			for(var k=0; k<rows.length; k++){ //iterate each column
@@ -221,7 +220,7 @@ function findConnections(CNT, CNTs, DR, DRTs, deadEnds){
 					if(thisCol===thatCol) plotsOnCol.push(plot); //if plots belong to same column
 				});
 				if(plotsOnCol.length>1){
-					var rowsOnCol = plotsOnCol.map(function(plot){return plot[0]}).sort(function(a,b){return a-b}); //get all row ib the samw col, and sort them
+					var rowsOnCol = plotsOnCol.map(function(plot){return plot[0]}).sort(function(a,b){return a-b}); //get all row on the same col, and sort them
 
 					for(var j=0; j<rowsOnCol.length-1; j++){
 						var thisRow = rowsOnCol[j]+1, //first row
@@ -230,13 +229,13 @@ function findConnections(CNT, CNTs, DR, DRTs, deadEnds){
 					}	
 				}						
 			}
-			plotsWithinCols = plotsWithinCols.map(function(plot){return plot.join(",")});
-			plotsWithinRows = plotsWithinRows.map(function(plot){return plot.join(",")});
+			plotsWithinCols = plotsWithinCols.map(function(p){return p.join(",")});
+			plotsWithinRows = plotsWithinRows.map(function(p){return p.join(",")});
 			var valuesWithin = [];
 			var plotsWithin = _.intersection(plotsWithinCols, plotsWithinRows).map(function(str){
-				var plot = str.split(",");
-				var r = parseInt(plot[0]);
-				var c = parseInt(plot[1]);
+				var p = str.split(",");
+				var r = parseInt(p[0]);
+				var c = parseInt(p[1]);
 				var val = grid[r][c];
 				valuesWithin.push(val);
 				return [r,c];
@@ -244,9 +243,10 @@ function findConnections(CNT, CNTs, DR, DRTs, deadEnds){
 
 			if(_.contains(valuesWithin, (cur_turn===1)?2:1)){ //if capture is more than 1 and not 0
 				var index = _.indexOf(NBS_join, cur_plot.join(","));
-				connection = connection.concat(CNTs);
+				DR = NBS_DRT[index];
+				route = route.concat(DRTs.concat(DR));
 				captured = captured.concat(plotsWithin);
-				route = route.concat(DRTs.concat(NBS_DRT[index]));
+				connection = connection.concat(CNTs);
 			}
 		}
 		if(NBS_removedCNTs.length>0){
@@ -259,6 +259,5 @@ function findConnections(CNT, CNTs, DR, DRTs, deadEnds){
 		else if(NBS_removedCNTs.length===0) deadEnds.push(CNT);
 	} 
 	else if(NBS.length===1) deadEnds.push(CNT);
-
 	return; //safety break for recursion
 }
